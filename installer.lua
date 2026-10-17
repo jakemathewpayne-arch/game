@@ -89,6 +89,93 @@ for _,data in ipairs({{"Luck",-33,32},{"Rolls",-16,32},{"Rebirth",1,32}}) do
  local b=block("Control",Vector3.new(6,1,3),Vector3.new(data[2],2,data[3]-6),data[1]=="Rebirth" and clr.gold or clr.mint,nil,m)
  prompt(b,"UPGRADE");sign(b,data[1]:upper())
 end
+
+-- Combined visual polish (previously a separate paste)
+local decor=Instance.new("Folder",world);decor.Name="VisualUpgrade"
+local function trim(name,size,offset,color,material)
+ local p=block(name,size,offset,color,material or Enum.Material.SmoothPlastic,decor)
+ p.CanCollide=false;p.CanTouch=false;p.CanQuery=false;p.CastShadow=false
+ return p
+end
+local function lamp(p,color,range,brightness)
+ local l=Instance.new("PointLight",p);l.Color=color;l.Range=range or 12
+ l.Brightness=brightness or 0.5;l.Shadows=false
+end
+local function wallSign(name,message,offset,w,accent)
+ local base=trim(name,Vector3.new(w,3,.35),offset,clr.dark,Enum.Material.Metal)
+ local g=Instance.new("SurfaceGui",base);g.Face=Enum.NormalId.Front;g.PixelsPerStud=45
+ local t=Instance.new("TextLabel",g);t.Size=UDim2.fromScale(1,1)
+ t.BackgroundTransparency=1;t.Text=message;t.TextColor3=accent or clr.white
+ t.TextScaled=true;t.Font=Enum.Font.GothamBold
+end
+local mint=Color3.fromRGB(85,211,169)
+local pearl=Color3.fromRGB(239,244,242)
+local silver=Color3.fromRGB(170,184,181)
+local deep=Color3.fromRGB(37,54,58)
+world.Floor.Material=Enum.Material.Concrete
+world.Floor.Color=Color3.fromRGB(211,221,217)
+for x=-40,40,10 do
+ local p=trim("Floor Line",Vector3.new(.13,.025,75),Vector3.new(x,.035,0),silver);p.Transparency=.55
+end
+for z=-35,35,10 do
+ local p=trim("Floor Line",Vector3.new(85,.025,.13),Vector3.new(0,.04,z),silver);p.Transparency=.55
+end
+for x=-35,35,14 do for z=-25,30,22 do
+ trim("Light Frame",Vector3.new(9,.25,2.5),Vector3.new(x,15.4,z),deep,Enum.Material.Metal)
+ local p=trim("Ceiling Light",Vector3.new(8,.12,1.6),Vector3.new(x,15.2,z),pearl,Enum.Material.Neon)
+ lamp(p,pearl,19,.25)
+end end
+machine.Housing.Color=deep
+glass.Transparency=.65;glass.Color=Color3.fromRGB(189,255,231)
+for _,x in ipairs({-6.2,6.2}) do
+ local p=trim("Reactor Light",Vector3.new(.28,8,.3),Vector3.new(x,7,-15),mint,Enum.Material.Neon)
+ lamp(p,mint,8,.3)
+end
+for _,y in ipairs({2.5,11.5}) do
+ trim("Reactor Trim",Vector3.new(13,.32,.4),Vector3.new(0,y,-15),silver,Enum.Material.Metal)
+end
+wallSign("Reactor Title","MUTANT REACTOR",Vector3.new(0,14.5,-15.3),14,Color3.fromRGB(189,255,231))
+trim("Reactor Plate",Vector3.new(10,.2,9),Vector3.new(0,2.2,-10),deep,Enum.Material.Metal)
+local reactorGlow=trim("Reactor Plate Glow",Vector3.new(8,.08,7),Vector3.new(0,2.35,-10),mint,Enum.Material.Neon)
+reactorGlow.Transparency=.65
+-- A small glow behind the previews; the rolled creature itself remains visible
+local core=trim("Energy Core",Vector3.new(2,2,2),Vector3.new(0,8,-7),mint,Enum.Material.Neon)
+core.Shape=Enum.PartType.Ball;core.Transparency=.8;lamp(core,mint,12,.35)
+for i=1,10 do
+ local m=pads:FindFirstChild("Pad"..i)
+ if m and m:FindFirstChild("Top") then
+  local top=m.Top;top.Color=deep;top.Material=Enum.Material.Metal
+  local glow=trim("Pad "..i.." Accent",Vector3.new(9.5,.12,9.5),top.Position-O+Vector3.new(0,-.13,0),i<=4 and mint or silver,Enum.Material.Neon)
+  glow.Transparency=i<=4 and .1 or .6
+  local cap=trim("Pad "..i.." Surface",Vector3.new(7.7,.05,7.7),top.Position-O+Vector3.new(0,.22,0),pearl)
+  cap.Transparency=.12
+ end
+end
+local collectorBody=collector:FindFirstChild("Collector Body")
+if collectorBody then
+ collectorBody.Color=deep
+ local p=trim("Collector Display",Vector3.new(5.5,3.2,.2),collectorBody.Position-O+Vector3.new(0,.5,-3.65),mint,Enum.Material.Neon)
+ p.Transparency=.25
+end
+wallSign("Roll Guide","01  ROLL",Vector3.new(-23,8,-30),15,mint)
+wallSign("Pad Guide","02  PLACE MUTANTS",Vector3.new(26,8,8),29,mint)
+wallSign("Cash Guide","03  COLLECT CASH",Vector3.new(-29,10,-4),20,clr.gold)
+wallSign("Upgrade Guide","04  UPGRADE",Vector3.new(-18,11,41),23,mint)
+for _,x in ipairs({-40,-20,0,20,40}) do
+ local p=trim("Wall Panel",Vector3.new(13,9,.2),Vector3.new(x,7,45.8),silver,Enum.Material.Metal)
+ p.Transparency=.7
+ trim("Wall Accent",Vector3.new(12,.2,.3),Vector3.new(x,12,45.5),mint,Enum.Material.Neon)
+end
+spawn.Color=mint;spawn.Material=Enum.Material.Neon;spawn.Transparency=.25
+Lighting.ClockTime=13.5;Lighting.Brightness=2.5
+Lighting.Ambient=Color3.fromRGB(170,185,183)
+Lighting.OutdoorAmbient=Color3.fromRGB(185,198,195)
+Lighting.GlobalShadows=true;Lighting.ExposureCompensation=0
+local atmosphere=Lighting:FindFirstChild("MutantLabAtmosphere") or Instance.new("Atmosphere",Lighting)
+atmosphere.Name="MutantLabAtmosphere";atmosphere.Density=.12;atmosphere.Haze=.4;atmosphere.Color=pearl
+local bloom=Lighting:FindFirstChild("MutantLabBloom") or Instance.new("BloomEffect",Lighting)
+bloom.Name="MutantLabBloom";bloom.Intensity=.18;bloom.Size=18;bloom.Threshold=1.5
+
 Lighting.ClockTime=13;Lighting.Brightness=2
 local server=Instance.new("Script");server.Name="MutantLabV5Server";server.Source=[==[
 local P=game:GetService("Players")
@@ -368,4 +455,4 @@ end)
 tip.Text="Step 1: Walk to ROLL and press E."
 task.wait(1);net.Action:FireServer("Get")
 ]==];client.Parent=SPS
-print("Mutant Lab V5 installed. Save, then Play to test.")
+print("Mutant Lab COMPLETE installed (gameplay + polished laboratory). Save, then Play.")
