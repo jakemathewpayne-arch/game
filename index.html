@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mutant Lab — Playable Preview</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#263b3a;background:#e9eeed}*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(145deg,#e5ebe9,#f8faf9)}button{font:inherit;cursor:pointer;border:0;border-radius:11px;padding:11px 16px;font-weight:700;background:#709b8b;color:white}button:hover:not(:disabled){filter:brightness(.94)}button:disabled{opacity:.42;cursor:not-allowed}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px clamp(12px,3vw,36px);background:#fff;border-bottom:1px solid #dce5e1}h1{font-size:23px;margin:0}h2{margin:0 0 10px;font-size:19px}.muted{color:#687e78}.stats{display:flex;gap:12px;flex-wrap:wrap;font-size:14px}.stats b{font-size:18px;color:#356d5a}
+main{max-width:1200px;margin:22px auto;padding:0 16px}.intro{background:#fff;border:1px solid #dae4e1;padding:15px 19px;border-radius:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.game{display:grid;grid-template-columns:minmax(300px,1.25fr) minmax(300px,1fr);gap:16px}.panel{background:#fff;border:1px solid #d9e4df;border-radius:19px;padding:17px;box-shadow:0 7px 25px #3b685a0a}
+.machine{min-height:325px;background:radial-gradient(ellipse at 50% 65%,#e0eae6,#bac9c3);border-radius:14px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;perspective:800px}
+.reactor{border:11px solid #7c9590;border-top-width:22px;border-bottom-width:20px;border-radius:46px;background:linear-gradient(90deg,#ffffff99,#d8efeb88 40%,#ffffff99);height:258px;width:220px;display:flex;align-items:center;justify-content:center;box-shadow:inset 16px 0 35px #fff8,0 12px 28px #596b672b;position:relative}
+.reactor:before,.reactor:after{content:"";position:absolute;top:-18px;bottom:-18px;width:7px;border-radius:9px;background:#526c66;left:16px}.reactor:after{left:auto;right:16px}
+.creature{--c:#91bf97;position:relative;width:135px;height:143px;filter:drop-shadow(0 12px 5px #3d655d35);animation:float 2s ease-in-out infinite}
+.body{position:absolute;top:29px;left:17px;width:100px;height:94px;border-radius:48% 48% 42% 42%;background:radial-gradient(circle at 35% 25%,#ffffff88,transparent 34%),var(--c);border:3px solid #30433a27}
+.eye{position:absolute;top:57px;width:26px;height:31px;background:white;border-radius:50%;border:2px solid #30433a36}.eye.l{left:41px}.eye.r{left:79px}.eye:after{content:"";position:absolute;left:11px;top:11px;background:#263b3a;border-radius:50%;width:9px;height:12px}
+.foot{position:absolute;top:111px;width:35px;height:20px;background:var(--c);border-radius:50%}.foot.l{left:29px}.foot.r{right:27px}
+.horn{position:absolute;top:9px;width:19px;height:42px;background:var(--c);border-radius:60% 60% 20% 20%;transform:rotate(-22deg);left:27px}.horn.r{left:auto;right:27px;transform:rotate(22deg)}
+@keyframes float{50%{transform:translateY(-8px)}}.machine-label{position:absolute;top:14px;left:14px;color:#4d655e;font-size:13px;letter-spacing:.13em;font-weight:800}.control{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}.control button{flex:1}.result{border:1px solid #d4e1dc;border-radius:12px;padding:13px;margin-top:12px;background:#f7faf8}.result strong{font-size:21px}.choices{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.secondary{background:#879793}.gold{background:#bd9656}.small{font-size:13px}.rarity{font-size:12px;letter-spacing:.08em;font-weight:800}
+.pads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pad{min-height:145px;border:2px solid #d8e2de;background:linear-gradient(#f5f8f6,#dce5e1);border-radius:14px;text-align:center;padding:10px;display:flex;align-items:center;flex-direction:column;gap:4px;justify-content:center}.pad.locked{opacity:.5}.pad .mini{font-size:36px}.pad button{padding:6px 10px;font-size:12px}.pad strong{font-size:14px}
+.shop{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}.shop button{font-size:13px;padding:10px}.inventory{display:flex;gap:9px;flex-wrap:wrap}.item{padding:9px 12px;background:#eef4f0;border:2px solid #dae6df;border-radius:11px;cursor:pointer;text-align:left}.item.active{border-color:#4c9476;background:#d5e9dd}.item span{font-size:12px;color:#5b776c}.footer{margin:15px 0;font-size:13px}.notice{min-height:25px;color:#416d60;font-weight:700;font-size:14px}.action-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media(max-width:800px){.game{grid-template-columns:1fr}.shop{grid-template-columns:1fr 1fr}.intro{align-items:flex-start}}
+</style></head>
+<body>
+<header><h1>🧪 Mutant Lab <span class="muted small">Playable preview</span></h1><div class="stats"><span>Cash <b id="cash">$400</b></span><span>Uncollected <b id="bank">$0</b></span><span>Income <b id="income">$0/s</b></span></div></header>
+<main><section class="intro"><div><b id="objective">Step 1: Roll your first mutant</b><div class="muted small">Roll → Buy → select from inventory → place on a pad → collect cash</div></div><button id="reset" class="secondary">Reset demo</button></section>
+<div class="game">
+<section class="panel"><h2>Roll machine</h2><div class="machine"><span class="machine-label">MUTATION CHAMBER</span><div class="reactor"><div id="creature"></div></div></div>
+<div class="control"><button id="roll">ROLL — $50</button><span class="muted small" id="rollinfo">1 choice per roll</span></div>
+<div id="results"></div><div class="notice" id="notice"></div>
+</section>
+<section class="panel"><h2>Your mutant pads <span class="muted small" id="slotcount">(4 unlocked)</span></h2><div class="pads" id="pads"></div>
+<div class="action-row" style="margin-top:13px"><button id="collect" class="gold">COLLECT CASH</button><span class="muted small">Mutants earn cash each second</span></div>
+</section>
+<section class="panel"><h2>Your inventory</h2><div class="muted small">Click a mutant, then click an empty pad to place it.</div><div class="inventory" id="inventory" style="margin-top:11px"></div></section>
+<section class="panel"><h2>Upgrades</h2><div class="muted small">Optional — focus on getting your first mutant before upgrading.</div><div class="shop"><button id="luck">Better luck</button><button id="multi">More choices</button><button class="gold" id="rebirth">Rebirth</button></div><p class="muted small">Rebirth unlocks 2 extra pads, but resets cash and placed mutants. Luck and roll upgrades stay.</p></section>
+</div><p class="footer muted">This is a standalone browser demonstration, not the Roblox experience. Progress saves in this browser only. The Roblox Studio version is maintained separately in installer.lua.</p></main>
+<script>
+const types=[
+{name:"Slime",rarity:"Common",price:50,rate:5,weight:48,color:"#90c197",symbol:"🟢"},
+{name:"Toxic Frog",rarity:"Uncommon",price:180,rate:15,weight:27,color:"#76b8a8",symbol:"🐸"},
+{name:"Crystal Beast",rarity:"Rare",price:650,rate:55,weight:15,color:"#8eabc9",symbol:"💎"},
+{name:"Shadow Mutant",rarity:"Epic",price:2500,rate:200,weight:7,color:"#aa91c6",symbol:"👾"},
+{name:"Omega Dragon",rarity:"Legendary",price:12000,rate:900,weight:2.7,color:"#c4a36f",symbol:"🐉"},
+{name:"Void Titan",rarity:"Secret",price:100000,rate:7000,weight:.3,color:"#bd8a98",symbol:"🌌"}
+];
+const key="mutant-lab-browser-v1";
+const start=()=>({cash:400,bank:0,rebirths:0,luck:0,rolls:1,owned:[0,0,0,0,0,0],pads:Array(10).fill(null),offers:[],selected:null,firstRoll:false});
+let state;try{state=JSON.parse(localStorage.getItem(key))||start()}catch{state=start()}
+if(!Array.isArray(state.owned)||!Array.isArray(state.pads))state=start();
+let rolling=false,display=null,message="";
+const el=id=>document.getElementById(id),fmt=n=>"$"+Math.floor(n).toLocaleString("en-US");
+const slots=()=>Math.min(10,4+2*state.rebirths);
+const income=()=>state.pads.reduce((s,id)=>s+(id===null?0:types[id]?.rate||0),0);
+const persist=()=>{try{localStorage.setItem(key,JSON.stringify(state))}catch{}};
+function creature(id){const m=types[id];return '<div class="creature" style="--c:'+m.color+'"><div class="horn"></div><div class="horn r"></div><div class="body"></div><div class="eye l"></div><div class="eye r"></div><div class="foot l"></div><div class="foot r"></div></div>'}
+function show(id){display=id;el("creature").innerHTML=creature(id)}
+function notify(s){message=s;el("notice").textContent=s}
+function pick(){const weights=types.map((m,i)=>m.weight*(i>=2?(1+state.luck*.4):1/(1+state.luck*.2)));const total=weights.reduce((a,b)=>a+b,0);let n=Math.random()*total;for(let i=0;i<weights.length;i++){n-=weights[i];if(n<=0)return i}return 0}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function objective(){if(!state.firstRoll)return "Step 1: Roll your first mutant";if(state.offers.length)return "Step 2: Buy a mutant or skip";if(state.owned.some(x=>x>0))return "Step 3: Select a mutant, then click a pad";if(income()>0)return "Step 4: Collect cash and roll again";return "Roll another mutant"}
+function render(){
+ el("cash").textContent=fmt(state.cash);el("bank").textContent=fmt(state.bank);el("income").textContent=fmt(income())+"/s";
+ el("objective").textContent=objective();el("slotcount").textContent="("+slots()+" unlocked)";
+ el("roll").textContent="ROLL "+state.rolls+(state.rolls>1?" CHOICES":" CHOICE")+" — "+fmt(state.rolls*50);
+ el("roll").disabled=rolling||state.offers.length>0||state.cash<state.rolls*50;
+ el("rollinfo").textContent=state.rolls+" choice"+(state.rolls>1?"s":"")+" per roll";
+ el("pads").innerHTML=state.pads.map((id,i)=>'<div class="pad '+(i>=slots()?"locked":"")+'"><strong>PAD '+(i+1)+'</strong><div class="mini">'+(id===null?"◌":types[id].symbol)+'</div><span class="small">'+(i>=slots()?"Locked":id===null?"Empty":types[id].name+" • "+fmt(types[id].rate)+"/sec")+'</span>'+(i>=slots()?"":'<button data-pad="'+i+'" class="'+(id===null?"":"secondary")+'">'+(id===null?"PLACE MUTANT":"REMOVE")+'</button>')+'</div>').join("");
+ el("inventory").innerHTML=state.owned.some(n=>n>0)?state.owned.map((count,i)=>count>0?'<button class="item '+(state.selected===i?"active":"")+'" data-select="'+i+'">'+types[i].symbol+' '+types[i].name+' ×'+count+'<br><span>'+fmt(types[i].rate)+'/sec</span></button>':"").join(""):'<span class="muted small">Empty. Buy a mutant after rolling.</span>';
+ const lc=Math.floor(300*2**state.luck),mc=state.rolls*600,rc=Math.floor(25000*3**state.rebirths);
+ el("luck").textContent="Luck Lv."+state.luck+" — "+fmt(lc);el("luck").disabled=state.luck>=15||state.cash<lc;
+ el("multi").textContent="Rolls "+state.rolls+"/5 — "+fmt(mc);el("multi").disabled=state.rolls>=5||state.cash<mc;
+ el("rebirth").textContent="Rebirth — "+fmt(rc);el("rebirth").disabled=state.rebirths>=3||state.cash<rc;
+ el("collect").textContent="COLLECT "+fmt(state.bank);el("collect").disabled=state.bank<1;
+ el("results").innerHTML=state.offers.length?'<div class="result"><b>YOUR ROLL</b>'+state.offers.map((id,i)=>'<div class="action-row" style="margin-top:9px"><div style="flex:1"><strong>'+types[id].name+'</strong><br><span class="rarity" style="color:'+types[id].color+'">'+types[id].rarity+'</span> · '+fmt(types[id].rate)+'/sec</div><button data-buy="'+i+'" '+(state.cash<types[id].price?"disabled":"")+'>BUY '+fmt(types[id].price)+'</button></div>').join("")+'<button class="secondary" id="skip" style="margin-top:12px;width:100%">SKIP REMAINING</button></div>':"";
+ persist()
+}
+async function roll(){
+ if(rolling||state.offers.length||state.cash<state.rolls*50)return;
+ rolling=true;state.cash-=state.rolls*50;state.offers=Array.from({length:state.rolls},pick);state.firstRoll=true;
+ notify("Watch the 3D mutant machine...");render();
+ for(const finalId of state.offers){
+  for(let i=0;i<22;i++){show(Math.floor(Math.random()*types.length));await sleep(40+Math.floor((i/22)**3*190))}
+  show(finalId);notify("You rolled "+types[finalId].name+"!");await sleep(850)
+ }
+ rolling=false;notify("Buy the mutants you want, or skip.");render()
+}
+el("roll").onclick=roll;
+el("collect").onclick=()=>{state.cash+=Math.floor(state.bank);state.bank-=Math.floor(state.bank);notify("Cash collected!");render()};
+el("luck").onclick=()=>{const n=Math.floor(300*2**state.luck);if(state.cash>=n&&state.luck<15){state.cash-=n;state.luck++;notify("Better luck unlocked.");render()}};
+el("multi").onclick=()=>{const n=state.rolls*600;if(state.cash>=n&&state.rolls<5){state.cash-=n;state.rolls++;notify("Now rolling "+state.rolls+" mutants at once.");render()}};
+el("rebirth").onclick=()=>{const n=Math.floor(25000*3**state.rebirths);if(state.cash<n||state.rebirths>=3)return;if(!confirm("Rebirth resets cash and mutants but unlocks 2 pads. Continue?"))return;state.cash=400;state.bank=0;state.rebirths++;state.owned=Array(6).fill(0);state.pads=Array(10).fill(null);state.offers=[];state.selected=null;notify("Rebirth complete! Two new pads unlocked.");render()};
+el("reset").onclick=()=>{if(confirm("Reset all browser demo progress?")){state=start();show(0);notify("Demo reset.");render()}};
+document.addEventListener("click",e=>{
+ const buy=e.target.closest("[data-buy]");if(buy){
+ const i=Number(buy.dataset.buy),id=state.offers[i];if(id===undefined)return;
+ if(state.cash<types[id].price){notify("Not enough cash.");return}
+ state.cash-=types[id].price;state.owned[id]++;state.offers.splice(i,1);state.selected=id;notify(types[id].name+" added to inventory. Click an empty pad.");render();return
+ }
+ const select=e.target.closest("[data-select]");if(select){state.selected=Number(select.dataset.select);notify("Selected "+types[state.selected].name+". Click a pad to place.");render();return}
+ const pad=e.target.closest("[data-pad]");if(pad){
+ const i=Number(pad.dataset.pad);if(i>=slots())return;
+ if(state.pads[i]!==null){const prev=state.pads[i];state.owned[prev]++;state.pads[i]=null;state.selected=prev;notify("Returned "+types[prev].name+" to inventory.")}
+ else if(state.selected!==null&&state.owned[state.selected]>0){state.owned[state.selected]--;state.pads[i]=state.selected;notify(types[state.selected].name+" placed! It now earns cash.");if(!state.owned[state.selected])state.selected=null}
+ else notify("Select a mutant from inventory first.");render();return
+ }
+ if(e.target.id==="skip"){state.offers=[];notify("Skipped. Roll again.");render()}
+});
+setInterval(()=>{const n=income();if(n>0){state.bank+=n;render()}},1000);
+show(0);render();
+</script></body></html>
