@@ -15,7 +15,7 @@ main{max-width:1200px;margin:22px auto;padding:0 16px}.intro{background:#fff;bor
 .eye{position:absolute;top:57px;width:26px;height:31px;background:white;border-radius:50%;border:2px solid #30433a36}.eye.l{left:41px}.eye.r{left:79px}.eye:after{content:"";position:absolute;left:11px;top:11px;background:#263b3a;border-radius:50%;width:9px;height:12px}
 .foot{position:absolute;top:111px;width:35px;height:20px;background:var(--c);border-radius:50%}.foot.l{left:29px}.foot.r{right:27px}
 .horn{position:absolute;top:9px;width:19px;height:42px;background:var(--c);border-radius:60% 60% 20% 20%;transform:rotate(-22deg);left:27px}.horn.r{left:auto;right:27px;transform:rotate(22deg)}
-@keyframes float{50%{transform:translateY(-8px)}}.machine-label{position:absolute;top:14px;left:14px;color:#4d655e;font-size:13px;letter-spacing:.13em;font-weight:800}.control{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}.control button{flex:1}.result{border:1px solid #d4e1dc;border-radius:12px;padding:13px;margin-top:12px;background:#f7faf8}.result strong{font-size:21px}.choices{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.secondary{background:#879793}.gold{background:#bd9656}.small{font-size:13px}.rarity{font-size:12px;letter-spacing:.08em;font-weight:800}
+@keyframes float{50%{transform:translateY(-8px)}}.machine-label{position:absolute;top:14px;left:14px;color:#4d655e;font-size:13px;letter-spacing:.13em;font-weight:800}.reactor.rolling{box-shadow:inset 16px 0 35px #fff8,0 0 0 7px #9dc8b455,0 14px 35px #5d9a8040}.reactor.rolling .creature{animation:float .45s ease-in-out infinite}.pad.selected-pad{border-color:#4c9476;box-shadow:0 0 0 3px #4c94762d}@keyframes appear{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}.control{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}.control button{flex:1}.result{border:1px solid #d4e1dc;border-radius:12px;padding:13px;margin-top:12px;background:#f7faf8}.result strong{font-size:21px}.choices{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.secondary{background:#879793}.gold{background:#bd9656}.small{font-size:13px}.rarity{font-size:12px;letter-spacing:.08em;font-weight:800}
 .pads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pad{min-height:145px;border:2px solid #d8e2de;background:linear-gradient(#f5f8f6,#dce5e1);border-radius:14px;text-align:center;padding:10px;display:flex;align-items:center;flex-direction:column;gap:4px;justify-content:center}.pad.locked{opacity:.5}.pad .mini{font-size:36px}.pad button{padding:6px 10px;font-size:12px}.pad strong{font-size:14px}
 .shop{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}.shop button{font-size:13px;padding:10px}.inventory{display:flex;gap:9px;flex-wrap:wrap}.item{padding:9px 12px;background:#eef4f0;border:2px solid #dae6df;border-radius:11px;cursor:pointer;text-align:left}.item.active{border-color:#4c9476;background:#d5e9dd}.item span{font-size:12px;color:#5b776c}.footer{margin:15px 0;font-size:13px}.notice{min-height:25px;color:#416d60;font-weight:700;font-size:14px}.action-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 @media(max-width:800px){.game{grid-template-columns:1fr}.shop{grid-template-columns:1fr 1fr}.intro{align-items:flex-start}}
@@ -25,13 +25,13 @@ main{max-width:1200px;margin:22px auto;padding:0 16px}.intro{background:#fff;bor
 <main><section class="intro"><div><b id="objective">Step 1: Roll your first mutant</b><div class="muted small">Roll → Buy → select from inventory → place on a pad → collect cash</div></div><button id="reset" class="secondary">Reset demo</button></section>
 <div class="game">
 <section class="panel"><h2>Roll machine</h2><div class="machine"><span class="machine-label">MUTATION CHAMBER</span><div class="reactor"><div id="creature"></div></div></div>
-<div class="control"><button id="roll">ROLL — $50</button><span class="muted small" id="rollinfo">1 choice per roll</span></div>
+<div class="control"><button id="roll">ROLL — $50</button><span class="muted small" id="rollinfo">1 choice per roll</span><span class="muted small" id="odds"></span></div>
 <div id="results"></div><div class="notice" id="notice"></div>
 </section>
 <section class="panel"><h2>Your mutant pads <span class="muted small" id="slotcount">(4 unlocked)</span></h2><div class="pads" id="pads"></div>
 <div class="action-row" style="margin-top:13px"><button id="collect" class="gold">COLLECT CASH</button><span class="muted small">Mutants earn cash each second</span></div>
 </section>
-<section class="panel"><h2>Your inventory</h2><div class="muted small">Click a mutant, then click an empty pad to place it.</div><div class="inventory" id="inventory" style="margin-top:11px"></div></section>
+<section class="panel"><h2>Your inventory</h2><div class="muted small">Bought mutants appear here. Select one, then click PLACE on an empty pad.</div><div class="inventory" id="inventory" style="margin-top:11px"></div></section>
 <section class="panel"><h2>Upgrades</h2><div class="muted small">Optional — focus on getting your first mutant before upgrading.</div><div class="shop"><button id="luck">Better luck</button><button id="multi">More choices</button><button class="gold" id="rebirth">Rebirth</button></div><p class="muted small">Rebirth unlocks 2 extra pads, but resets cash and placed mutants. Luck and roll upgrades stay.</p></section>
 </div><p class="footer muted">This is a standalone browser demonstration, not the Roblox experience. Progress saves in this browser only. The Roblox Studio version is maintained separately in installer.lua.</p></main>
 <script>
@@ -60,7 +60,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function objective(){if(!state.firstRoll)return "Step 1: Roll your first mutant";if(state.offers.length)return "Step 2: Buy a mutant or skip";if(state.owned.some(x=>x>0))return "Step 3: Select a mutant, then click a pad";if(income()>0)return "Step 4: Collect cash and roll again";return "Roll another mutant"}
 function render(){
  el("cash").textContent=fmt(state.cash);el("bank").textContent=fmt(state.bank);el("income").textContent=fmt(income())+"/s";
- el("objective").textContent=objective();el("slotcount").textContent="("+slots()+" unlocked)";
+ el("objective").textContent=objective();el("slotcount").textContent="("+slots()+" unlocked)";el("odds").textContent=" • Luck Lv."+state.luck;
  el("roll").textContent="ROLL "+state.rolls+(state.rolls>1?" CHOICES":" CHOICE")+" — "+fmt(state.rolls*50);
  el("roll").disabled=rolling||state.offers.length>0||state.cash<state.rolls*50;
  el("rollinfo").textContent=state.rolls+" choice"+(state.rolls>1?"s":"")+" per roll";
@@ -76,13 +76,13 @@ function render(){
 }
 async function roll(){
  if(rolling||state.offers.length||state.cash<state.rolls*50)return;
- rolling=true;state.cash-=state.rolls*50;state.offers=Array.from({length:state.rolls},pick);state.firstRoll=true;
+ rolling=true;document.querySelector(".reactor").classList.add("rolling");state.cash-=state.rolls*50;state.offers=Array.from({length:state.rolls},pick);state.firstRoll=true;
  notify("Watch the 3D mutant machine...");render();
  for(const finalId of state.offers){
   for(let i=0;i<22;i++){show(Math.floor(Math.random()*types.length));await sleep(40+Math.floor((i/22)**3*190))}
   show(finalId);notify("You rolled "+types[finalId].name+"!");await sleep(850)
  }
- rolling=false;notify("Buy the mutants you want, or skip.");render()
+ rolling=false;document.querySelector(".reactor").classList.remove("rolling");notify("Buy the mutants you want, or skip.");render()
 }
 el("roll").onclick=roll;
 el("collect").onclick=()=>{state.cash+=Math.floor(state.bank);state.bank-=Math.floor(state.bank);notify("Cash collected!");render()};
